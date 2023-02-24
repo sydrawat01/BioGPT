@@ -24,7 +24,7 @@ This repository contains the implementation of [BioGPT: Generative Pre-trained T
 
 ### [PyTorch](http://pytorch.org/)
 
-These are commands to help you install the stable PyTorch version on your system. For details on how to install PyTorch(other options), refer [pytorch.org](https://pytorch.org/).
+These are commands to help you install the stable PyTorch version on your system. For details on other installation options for PyTorch, refer [pytorch.org](https://pytorch.org/).
 
 ```shell
 # Linux, pip, python & CPU
@@ -89,6 +89,8 @@ pip install scikit-learn
 ```
 
 Remember to set the environment variables `MOSES` and `FASTBPE` to the path of Moses and fastBPE respectively, as they will be required later.
+
+> INFO: You can also run the `python install -r requirements.txt` command to install other dev dependencies.
 
 ## Pre-trained models
 
@@ -241,11 +243,57 @@ Check out these demos on Hugging Face Spaces:
 - [Text Generation with BioGPT-Large](https://huggingface.co/spaces/katielink/biogpt-large-demo)
 - [Question Answering with BioGPT-Large-PubMedQA](https://huggingface.co/spaces/katielink/biogpt-qa-demo)
 
-## Docker image
+## Docker
 
-_[Work in Progress]_
-A complete BioGPT-ready Ubuntu docker image is in development. Once ready, it will be available on dockerhub.
-Uses will be able to use the [biogpt-pt.py](./biogpt-pt.py) script to execute sample BioGPT models to return descriptive results on biomedical terms.
+> NOTE: You'll need to have docker installed on your local system to run the docker image
+
+### Dockerhub Image
+
+To use the docker image that comes bundled with BioGPT (basic model), run the command:
+
+```shell
+docker pull sydrawat/bigpt
+```
+
+To run this image in a container, follow steps 2 through 4 from the [image creation section](./README.md/#image-creation).
+
+### Image creation
+
+1. To use the docker image of this project, build it using the below command:
+
+> [ref](https://github.com/docker/buildx/issues/484)
+
+```shell
+DOCKER_BUILDKIT=0 docker build --progress=plain -t biogpt:v1 .
+```
+
+2. To run the docker image in a docker container with the bash prompt:
+
+```shell
+docker run -ti biogpt bash
+```
+
+3. To run the POC pre-trained BioGPT demo:
+
+```shell
+python3 biogpt-pt.py
+```
+
+4. To change the input prompt:
+
+```shell
+vim biogpt-pt.py
+# change line number 12
+# (esc):wq!(return)
+```
+
+Now run the python script again:
+
+```shell
+python3 biogpt-pt.py
+```
+
+> TODO: Add input prompt as args to python exec file
 
 ## [License](./LICENSE)
 
