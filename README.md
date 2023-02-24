@@ -1,87 +1,139 @@
 # BioGPT
-This repository contains the implementation of [BioGPT: Generative Pre-trained Transformer for Biomedical Text Generation and Mining](https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbac409/6713511?guestAccessKey=a66d9b5d-4f83-4017-bb52-405815c907b9), by Renqian Luo, Liai Sun, Yingce Xia, Tao Qin, Sheng Zhang, Hoifung Poon and Tie-Yan Liu.
 
-# News!
-* BioGPT-Large model with 1.5B parameters is coming, currently available on PubMedQA task with SOTA performance of 81% accuracy. See [Question Answering on PubMedQA](examples/QA-PubMedQA/) for evaluation.
+BioGPT is a generative language model that has been pre-trained on large amounts of biomedical literature. It is a domain-specific variant of the GPT family of language models and is designed to generate fluent descriptions for biomedical terms. It has been shown to outperform previous models on a range of biomedical natural language processing tasks, including relation extraction and question-answering, making it a promising tool for biomedical researchers and practitioners.
 
+## Implementation policy
 
-# Requirements and Installation
+This repository contains the implementation of [BioGPT: Generative Pre-trained Transformer for Biomedical Text Generation and Mining](https://academic.oup.com/bib/advance-article/doi/10.1093/bib/bbac409/6713511?guestAccessKey=a66d9b5d-4f83-4017-bb52-405815c907b9), written by:
 
-* [PyTorch](http://pytorch.org/) version == 1.12.0
-* Python version == 3.10
-* fairseq version == 0.12.0:
+- Renqian Luo
+- Liai Sun
+- Yingce Xia
+- Tao Qin
+- Sheng Zhang
+- Hoifung Poon
+- Tie-Yan Liu.
 
-``` bash
-git clone https://github.com/pytorch/fairseq
+## News!
+
+- BioGPT-Large model with 1.5B parameters is coming, currently available on PubMedQA task with SOTA performance of 81% accuracy. See [Question Answering on PubMedQA](examples/QA-PubMedQA/) for evaluation.
+
+## Requirements and Installation
+
+> NOTE: Since this project uses various open-source libraries, some of these are not built for specific OS environments. Most issues faced were related to the Microsoft Windows environment, where the `g++` libraries would not compile. For a more detailed analysis on these issues, refer [this discussion here](https://github.com/microsoft/BioGPT/discussions/68). Hence, most of the support will be provided only for Linux/MacOS environments.
+
+### [PyTorch](http://pytorch.org/)
+
+These are commands to help you install the stable PyTorch version on your system. For details on how to install PyTorch(other options), refer [pytorch.org](https://pytorch.org/).
+
+```shell
+# Linux, pip, python & CPU
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+```shell
+# Linux, pip, python & GPU(CUDA v11.7)
+pip3 install torch torchvision torchaudio
+```
+
+```shell
+# Linux, pip, python & GPU(CUDA v11.6)
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+```
+
+### [Python](https://www.python.org/downloads/release/python-3100/)
+
+```shell
+# Ubuntu
+sudo apt-get install python3.10 -y
+```
+
+### [fairseq](https://github.com/facebookresearch/fairseq)
+
+```shell
+git clone https://github.com/facebookresearch/fairseq.git
 cd fairseq
 git checkout v0.12.0
 pip install .
+# python3 if you have python3 installed.
 python setup.py build_ext --inplace
 cd ..
 ```
-* Moses
-``` bash
+
+### [Moses](https://github.com/moses-smt/mosesdecoder)
+
+```shell
 git clone https://github.com/moses-smt/mosesdecoder.git
 export MOSES=${PWD}/mosesdecoder
 ```
-* fastBPE
-``` bash
+
+### [fastBPE](https://github.com/glample/fastBPE)
+
+```shell
 git clone https://github.com/glample/fastBPE.git
 export FASTBPE=${PWD}/fastBPE
 cd fastBPE
 g++ -std=c++11 -pthread -O3 fastBPE/main.cc -IfastBPE -o fast
 ```
-* sacremoses
-``` bash
+
+### [sacremoses](https://github.com/alvations/sacremoses)
+
+```shell
 pip install sacremoses
 ```
-* sklearn
-``` bash
+
+### [sklearn](https://github.com/scikit-learn/scikit-learn)
+
+```shell
 pip install scikit-learn
 ```
 
-Remember to set the environment variables `MOSES` and `FASTBPE` to the path of Moses and fastBPE respetively, as they will be required later.
+Remember to set the environment variables `MOSES` and `FASTBPE` to the path of Moses and fastBPE respectively, as they will be required later.
 
-# Getting Started
 ## Pre-trained models
-We provide our pre-trained BioGPT model checkpoints along with fine-tuned checkpoints for downstream tasks, available both through URL download as well as through the Hugging Face 🤗 Hub. 
 
-|Model|Description|URL|🤗 Hub|
-|----|----|---|---|
-|BioGPT|Pre-trained BioGPT model checkpoint|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/Pre-trained-BioGPT.tgz)|[link](https://huggingface.co/microsoft/biogpt)|
-|BioGPT-Large|Pre-trained BioGPT-Large model checkpoint|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/Pre-trained-BioGPT-Large.tgz)|[link](https://huggingface.co/microsoft/biogpt-large)|
-|BioGPT-QA-PubMedQA-BioGPT|Fine-tuned BioGPT for question answering task on PubMedQA|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/QA-PubMedQA-BioGPT.tgz)| |
-|BioGPT-QA-PubMEDQA-BioGPT-Large|Fine-tuned BioGPT-Large for question answering task on PubMedQA|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/QA-PubMedQA-BioGPT-Large.tgz)|[link](https://huggingface.co/microsoft/biogpt-large-pubmedqa)|
-|BioGPT-RE-BC5CDR|Fine-tuned BioGPT for relation extraction task on BC5CDR|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-BC5CDR-BioGPT.tgz)| |
-|BioGPT-RE-DDI|Fine-tuned BioGPT for relation extraction task on DDI|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-DDI-BioGPT.tgz)| |
-|BioGPT-RE-DTI|Fine-tuned BioGPT for relation extraction task on KD-DTI|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-DTI-BioGPT.tgz)| |
-|BioGPT-DC-HoC|Fine-tuned BioGPT for document classification task on HoC|[link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/DC-HoC-BioGPT.tgz)| |
+We provide our pre-trained BioGPT model checkpoints along with fine-tuned checkpoints for downstream tasks, available both through URL download as well as through the Hugging Face 🤗 Hub.
+
+| Model                           | Description                                                     | URL                                                                                                           | 🤗 Hub                                                         |
+| ------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| BioGPT                          | Pre-trained BioGPT model checkpoint                             | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/Pre-trained-BioGPT.tgz)       | [link](https://huggingface.co/microsoft/biogpt)                |
+| BioGPT-Large                    | Pre-trained BioGPT-Large model checkpoint                       | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/Pre-trained-BioGPT-Large.tgz) | [link](https://huggingface.co/microsoft/biogpt-large)          |
+| BioGPT-QA-PubMedQA-BioGPT       | Fine-tuned BioGPT for question answering task on PubMedQA       | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/QA-PubMedQA-BioGPT.tgz)       |                                                                |
+| BioGPT-QA-PubMEDQA-BioGPT-Large | Fine-tuned BioGPT-Large for question answering task on PubMedQA | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/QA-PubMedQA-BioGPT-Large.tgz) | [link](https://huggingface.co/microsoft/biogpt-large-pubmedqa) |
+| BioGPT-RE-BC5CDR                | Fine-tuned BioGPT for relation extraction task on BC5CDR        | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-BC5CDR-BioGPT.tgz)         |                                                                |
+| BioGPT-RE-DDI                   | Fine-tuned BioGPT for relation extraction task on DDI           | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-DDI-BioGPT.tgz)            |                                                                |
+| BioGPT-RE-DTI                   | Fine-tuned BioGPT for relation extraction task on KD-DTI        | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-DTI-BioGPT.tgz)            |                                                                |
+| BioGPT-DC-HoC                   | Fine-tuned BioGPT for document classification task on HoC       | [link](https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/DC-HoC-BioGPT.tgz)            |                                                                |
 
 Download them and extract them to the `checkpoints` folder of this project.
 
 For example:
-``` bash
+
+```shell
 mkdir checkpoints
 cd checkpoints
 wget https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/Pre-trained-BioGPT.tgz
 tar -zxvf Pre-trained-BioGPT.tgz
 ```
 
-## Example Usage
+### Example Usage
+
 Use pre-trained BioGPT model in your code:
+
 ```python
 import torch
 from fairseq.models.transformer_lm import TransformerLanguageModel
 m = TransformerLanguageModel.from_pretrained(
-        "checkpoints/Pre-trained-BioGPT", 
-        "checkpoint.pt", 
+        "checkpoints/Pre-trained-BioGPT",
+        "checkpoint.pt",
         "data",
-        tokenizer='moses', 
-        bpe='fastbpe', 
+        tokenizer='moses',
+        bpe='fastbpe',
         bpe_codes="data/bpecodes",
         min_len=100,
         max_len_b=1024)
 m.cuda()
+# comment m.cuda() if you are not using the PyTorch with GPU support
 src_tokens = m.encode("COVID-19 is")
 generate = m.generate([src_tokens], beam=5)[0]
 output = m.decode(generate[0]["tokens"])
@@ -89,19 +141,21 @@ print(output)
 ```
 
 Use fine-tuned BioGPT model on KD-DTI for drug-target-interaction in your code:
+
 ```python
 import torch
 from src.transformer_lm_prompt import TransformerLanguageModelPrompt
 m = TransformerLanguageModelPrompt.from_pretrained(
-        "checkpoints/RE-DTI-BioGPT", 
-        "checkpoint_avg.pt", 
+        "checkpoints/RE-DTI-BioGPT",
+        "checkpoint_avg.pt",
         "data/KD-DTI/relis-bin",
-        tokenizer='moses', 
-        bpe='fastbpe', 
+        tokenizer='moses',
+        bpe='fastbpe',
         bpe_codes="data/bpecodes",
         max_len_b=1024,
         beam=1)
 m.cuda()
+# comment m.cuda() if you are not using the PyTorch with GPU support
 src_text="" # input text, e.g., a PubMed abstract
 src_tokens = m.encode(src_text)
 generate = m.generate([src_tokens], beam=args.beam)[0]
@@ -111,14 +165,21 @@ print(output)
 
 For more downstream tasks, please see below.
 
-## Downstream tasks
+### Downstream tasks
+
 See corresponding folder in [examples](examples):
-### [Relation Extraction on BC5CDR](examples/RE-BC5CDR)
-### [Relation Extraction on KD-DTI](examples/RE-DTI/)
-### [Relation Extraction on DDI](examples/RE-DDI)
-### [Document Classification on HoC](examples/DC-HoC/)
-### [Question Answering on PubMedQA](examples/QA-PubMedQA/)
-### [Text Generation](examples/text-generation/)
+
+#### [Relation Extraction on BC5CDR](examples/RE-BC5CDR)
+
+#### [Relation Extraction on KD-DTI](examples/RE-DTI/)
+
+#### [Relation Extraction on DDI](examples/RE-DDI)
+
+#### [Document Classification on HoC](examples/DC-HoC/)
+
+#### [Question Answering on PubMedQA](examples/QA-PubMedQA/)
+
+#### [Text Generation](examples/text-generation/)
 
 ## Hugging Face 🤗 Usage
 
@@ -173,20 +234,27 @@ tokenizer.decode(beam_output[0], skip_special_tokens=True)
 
 For more information, please see the [documentation](https://huggingface.co/docs/transformers/main/en/model_doc/biogpt) on the Hugging Face website.
 
-## Demos
+### Demos
 
 Check out these demos on Hugging Face Spaces:
-* [Text Generation with BioGPT-Large](https://huggingface.co/spaces/katielink/biogpt-large-demo)
-* [Question Answering with BioGPT-Large-PubMedQA](https://huggingface.co/spaces/katielink/biogpt-qa-demo)
 
-# License
+- [Text Generation with BioGPT-Large](https://huggingface.co/spaces/katielink/biogpt-large-demo)
+- [Question Answering with BioGPT-Large-PubMedQA](https://huggingface.co/spaces/katielink/biogpt-qa-demo)
+
+## Docker image
+
+_[Work in Progress]_
+A complete BioGPT-ready Ubuntu docker image is in development. Once ready, it will be available on dockerhub.
+Uses will be able to use the [biogpt-pt.py](./biogpt-pt.py) script to execute sample BioGPT models to return descriptive results on biomedical terms.
+
+## [License](./LICENSE)
 
 BioGPT is MIT-licensed.
 The license applies to the pre-trained models as well.
 
-# Contributing
+## [Contributing](./CODE_OF_CONDUCT.md)
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+This project welcomes contributions and suggestions. Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 
@@ -198,10 +266,10 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-# Trademarks
+## Trademarks
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
+trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
