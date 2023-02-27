@@ -9,6 +9,8 @@ m = TransformerLanguageModel.from_pretrained(
         bpe_codes="data/bpecodes",
         min_len=100,
         max_len_b=1024)
+# m.cuda()
+# comment m.cuda() if you are not using the PyTorch with GPU support
 prompt = "Empagliflozin is" # change prompt text here
 src_tokens = m.encode(prompt)
 generate = m.generate([src_tokens], beam=5)[0]

@@ -2,7 +2,7 @@
 
 echo "+-----------------------------------------------------------------------------------------------------------------------------------------+"
 echo "|                                                                                                                                         |"
-echo "|                                                           INSTALL SCRIPT v1.0                                                           |"
+echo "|                                                           INSTALL SCRIPT v2.0                                                           |"
 echo "|                                                                                                                                         |"
 echo "+-----------------------------------------------------------------------------------------------------------------------------------------+"
 apt-get update
@@ -79,12 +79,30 @@ pip install fastBPE
 
 echo "+-----------------------------------------------------------------------------------------------------------------------------------------+"
 echo "|                                                                                                                                         |"
-echo "|                                                    Creating Pretrained BioGPT checkpoint                                                |"
+echo "|                                                   Creating Pretrained BioGPT checkpoints                                                |"
 echo "|                                                                                                                                         |"
 echo "+-----------------------------------------------------------------------------------------------------------------------------------------+"
 mkdir checkpoints
 cd checkpoints
-wget https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/Pre-trained-BioGPT.tgz
+wget -q https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/Pre-trained-BioGPT.tgz
 tar -zxvf Pre-trained-BioGPT.tgz
+wget -q https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-DDI-BioGPT.tgz
+tar -zxvf RE-DDI-BioGPT.tgz
+wget -q https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/RE-DTI-BioGPT.tgz
+tar -zxvf RE-DTI-BioGPT.tgz
+wget -q https://msramllasc.blob.core.windows.net/modelrelease/BioGPT/checkpoints/QA-PubMedQA-BioGPT.tgz
+tar -zxvf QA-PubMedQA-BioGPT.tgz
 cd ..
 
+echo "+-----------------------------------------------------------------------------------------------------------------------------------------+"
+echo "|                                                                                                                                         |"
+echo "|                                                Creating Pretrained BioGPT checkpoint data                                               |"
+echo "|                                                                                                                                         |"
+echo "+-----------------------------------------------------------------------------------------------------------------------------------------+"
+cd examples/RE-DTI
+bash preprocess.sh
+cd ../RE-DDI
+bash preprocess.sh
+cd ../QA-PubMedQA
+bash preprocess.sh
+cd ../../

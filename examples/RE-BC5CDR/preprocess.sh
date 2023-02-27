@@ -10,7 +10,7 @@ if [ -d "${OUTPUT_DIR}" ]; then
     rm -rf ${OUTPUT_DIR}
 fi
 
-python rebuild_data.py ${RAW_DATA_DIR}
+python3 rebuild_data.py ${RAW_DATA_DIR}
 
 cp ${DATA_DIR}/../dict.txt ${RAW_DATA_DIR}/
 cp ${DATA_DIR}/../bpecodes ${RAW_DATA_DIR}/
