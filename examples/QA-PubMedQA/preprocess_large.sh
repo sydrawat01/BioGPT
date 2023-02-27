@@ -10,7 +10,7 @@ if [ -d "${OUTPUT_DIR}" ]; then
     rm -rf ${OUTPUT_DIR}
 fi
 
-python rebuild_data_large.py ${RAW_DATA_DIR} ${prefix}
+python3 rebuild_data_large.py ${RAW_DATA_DIR} ${prefix}
 
 cp ${DATA_DIR}/../biogpt_large_dict.txt ${RAW_DATA_DIR}/
 cp ${DATA_DIR}/../biogpt_large_bpecodes ${RAW_DATA_DIR}/

@@ -34,7 +34,7 @@ def main(args):
     if m.cfg.common.fp16:
         print('Converting to float 16')
         m.half()
-    m.cuda()
+    # m.cuda()
 
     outputs = m.sample(src_inputs, beam=args.beam)
 
